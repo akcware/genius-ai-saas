@@ -3,7 +3,7 @@
 import axios from "axios";
 import * as z from "zod";
 import { Heading } from "@/components/heading";
-import { MessageCircle } from "lucide-react";
+import { Music } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -14,15 +14,12 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import OpenAI from "openai";
 import { Empty } from "@/components/empty";
 import { Loader } from "@/components/loader";
 
-export default function ConversationPage() {
+export default function VideoPage() {
   const router = useRouter();
-  const [messages, setMessages] = useState<
-    OpenAI.Chat.Completions.CreateChatCompletionRequestMessage[]
-  >([]);
+  const [video, setVideo] = useState<string>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,18 +32,10 @@ export default function ConversationPage() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userMessage: OpenAI.Chat.Completions.CreateChatCompletionRequestMessage =
-        {
-          role: "user",
-          content: values.prompt,
-        };
+      setVideo(undefined);
 
-      const newMessages = [...messages, userMessage];
-      const res = await axios.post("/api/conversation", {
-        messages: newMessages,
-      });
-
-      setMessages((current) => [...current, userMessage, res.data]);
+      const res = await axios.post("/api/video", values);
+      setVideo(res.data[0]);
       form.reset();
     } catch (err) {
       // TODO: Open pro modal
@@ -59,11 +48,11 @@ export default function ConversationPage() {
   return (
     <div>
       <Heading
-        title="Conversation"
-        description="Our most advences conversation model."
-        icon={MessageCircle}
-        iconColor="text-violet-500"
-        bgColor="bg-violet-500/10"
+        title="Video Generation"
+        description="Turn your prompt into video."
+        icon={Music}
+        iconColor="text-orange-700"
+        bgColor="bg-orange-700/10"
       />
       <div className="px-4 lg:px-8">
         <div>
@@ -80,7 +69,7 @@ export default function ConversationPage() {
                       <Input
                         className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                         disabled={isLoading}
-                        placeholder="How do I calculate the radius of a circle?"
+                        placeholder="Clown fish is swimming around a coral reef..."
                         {...field}
                       />
                     </FormControl>
@@ -89,9 +78,9 @@ export default function ConversationPage() {
               />
               <Button
                 className="col-span-12 lg:col-span-2 w-full"
-                disabled={isLoading}
+                disabled={true}
               >
-                Generate
+                SOON
               </Button>
             </form>
           </Form>
@@ -99,18 +88,18 @@ export default function ConversationPage() {
         <div className="space-y-4 mt-4">
           {isLoading && (
             <div className="p-8 rounded-lg w-full flex items-center justify-center bg-muted">
-               <Loader />
+              <Loader />
             </div>
           )}
 
-          {messages.length === 0 && !isLoading && (
-            <Empty label="No conversation started." />
+          {!video && !isLoading && <Empty label="No video generated." />}
+
+
+          {video && (
+            <video className="w-full aspect-video mt-8 rounded-lg border bg-black" controls>
+              <source src={video} />
+            </video>
           )}
-          <div className="flex flex-col-reverse gap-y-4">
-            {messages.map((message) => (
-              <div key={message.content}>{message.content}</div>
-            ))}
-          </div>
         </div>
       </div>
     </div>

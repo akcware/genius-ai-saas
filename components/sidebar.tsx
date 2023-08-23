@@ -27,37 +27,37 @@ const routes = [
   {
     label: "Conversation",
     icon: MessageCircle,
-    href: "/conversation",
+    href: "/dashboard/conversation",
     color: "text-violet-500",
   },
   {
     label: "Image Generation",
     icon: ImageIcon,
-    href: "/image",
+    href: "/dashboard/image",
     color: "text-pink-500",
   },
   {
     label: "Video Generation",
     icon: VideoIcon,
-    href: "/video",
+    href: "/dashboard/video",
     color: "text-orange-500",
   },
   {
     label: "Music Generation",
     icon: MusicIcon,
-    href: "/music",
+    href: "/dashboard/music",
     color: "text-emerald-500",
   },
   {
     label: "Code Generation",
     icon: Code,
-    href: "/code",
+    href: "/dashboard/code",
     color: "text-green-700",
   },
   {
     label: "Settings",
     icon: Settings,
-    href: "/settings",
+    href: "/dashboard/settings",
   },
 ];
 
