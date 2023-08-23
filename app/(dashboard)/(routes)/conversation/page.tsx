@@ -15,10 +15,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import OpenAI from "openai";
+import { Empty } from "@/components/empty";
+import { Loader } from "@/components/loader";
 
 export default function ConversationPage() {
   const router = useRouter();
-  const [messages, setMessages] = useState<OpenAI.Chat.Completions.CreateChatCompletionRequestMessage[]>([]);
+  const [messages, setMessages] = useState<
+    OpenAI.Chat.Completions.CreateChatCompletionRequestMessage[]
+  >([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -31,18 +35,19 @@ export default function ConversationPage() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const userMessage: OpenAI.Chat.Completions.CreateChatCompletionRequestMessage = {
-        role: "user",
-        content: values.prompt,
-      };
+      const userMessage: OpenAI.Chat.Completions.CreateChatCompletionRequestMessage =
+        {
+          role: "user",
+          content: values.prompt,
+        };
 
-      const newMessages = [...messages, userMessage]
+      const newMessages = [...messages, userMessage];
       const res = await axios.post("/api/conversation", {
-        messages: newMessages
-      })
+        messages: newMessages,
+      });
 
-      setMessages((current) => [...current, userMessage, res.data])
-      form.reset()
+      setMessages((current) => [...current, userMessage, res.data]);
+      form.reset();
     } catch (err) {
       // TODO: Open pro modal
       console.log(err);
@@ -92,8 +97,19 @@ export default function ConversationPage() {
           </Form>
         </div>
         <div className="space-y-4 mt-4">
+          {isLoading && (
+            <div className="p-8 rounded-lg w-full flex items-center justify-center bg-muted">
+               <Loader />
+            </div>
+          )}
+
+          {messages.length === 0 && !isLoading && (
+            <Empty label="No conversation started." />
+          )}
           <div className="flex flex-col-reverse gap-y-4">
-            {messages.map(message => (<div key={message.content}>{message.content}</div>))}
+            {messages.map((message) => (
+              <div key={message.content}>{message.content}</div>
+            ))}
           </div>
         </div>
       </div>
